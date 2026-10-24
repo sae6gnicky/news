@@ -465,7 +465,7 @@
             };
 
             const handleUpdateBlock = (id, field, value) => {
-                setBlocks(blocks.map(b => {
+                setBlocks(prevBlocks => prevBlocks.map(b => {
                     if (b.id !== id) return b;
                     if (field === 'headline' && value.length > MAX_HEADLINE_LENGTH) {
                         value = value.slice(0, MAX_HEADLINE_LENGTH);
@@ -480,8 +480,11 @@
                 // 업로드 즉시 프리로드하여 방송 중 깜빡임 방지
                 const img = new Image();
                 img.src = objectUrl;
-                handleUpdateBlock(id, 'bgUrl', objectUrl);
-                handleUpdateBlock(id, 'fileName', file.name);
+                // bgUrl과 fileName을 한 번에 업데이트하여 상태 덮어쓰기 방지
+                setBlocks(prevBlocks => prevBlocks.map(b => {
+                    if (b.id !== id) return b;
+                    return { ...b, bgUrl: objectUrl, fileName: file.name };
+                }));
             };
 
             // 드래그 앤 드롭 이벤트
